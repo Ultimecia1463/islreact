@@ -206,44 +206,45 @@ const Detect = () => {
   return (
     <>
       <div className="signlang_detection-container">
-        
-            <div style={{ position: "relative" }}>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                // screenshotFormat="image/jpeg"
-                className="signlang_webcam"
-              />
+      
+      {/* LEFT: Webcam + Canvas + Start/Stop Box */}
+      <div className="signlang_left-section">
+        <div style={{ position: "relative" }}>
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            className="signlang_webcam"
+          />
+          <canvas ref={canvasRef} className="signlang_canvas" />
+        </div>
 
-              <canvas ref={canvasRef} className="signlang_canvas" />
+        <div className="signlang_data-container">
+          <button onClick={enableCam}>
+            {webcamRunning ? "Stop" : "Start"}
+          </button>
 
-              <div className="signlang_data-container">
-                <button onClick={enableCam}>
-                  {webcamRunning ? "Stop" : "Start"}
-                </button>
-
-                <div className="signlang_data">
-                  <p className="gesture_output">{gestureOutput}</p>
-
-                  {progress ? <ProgressBar progress={progress} /> : null}
-                </div>
-              </div>
-            </div>
-
-            <div className="signlang_imagelist-container">
-              <h2 className="gradient__text">Image</h2>
-
-              <div className="signlang_image-div">
-                {currentImage ? (
-                  <img src={currentImage.url} alt={`img ${currentImage.id}`} />
-                ) : (
-                  <h3 className="gradient__text">
-                    Click on the Start Button <br /> to practice with Images
-                  </h3>
-                )}
-              </div>
-            </div>
+          <div className="signlang_data">
+            <p className="gesture_output">{gestureOutput}</p>
+            {progress ? <ProgressBar progress={progress} /> : null}
+          </div>
+        </div>
       </div>
+
+      {/* RIGHT: Image Display */}
+      <div className="signlang_imagelist-container">
+        <h2 className="gradient__text">Image</h2>
+
+        <div className="signlang_image-div">
+          {currentImage ? (
+            <img src={currentImage.url} alt={`img ${currentImage.id}`} />
+          ) : (
+            <h3 className="gradient__text">
+              Click on the Start Button <br /> to practice with Images
+            </h3>
+          )}
+        </div>
+      </div>
+    </div>
     </>
   );
 };
