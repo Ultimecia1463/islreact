@@ -205,7 +205,7 @@ const Detect = () => {
 
   return (
     <>
-      <div className="signlang_detection-container">
+    <div className="signlang_detection-container">
       
       {/* LEFT: Webcam + Canvas + Start/Stop Box */}
       <div className="signlang_left-section">
