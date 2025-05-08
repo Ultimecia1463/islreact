@@ -18,6 +18,7 @@ let startTime = "";
 const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const uploadedVideoRef = useRef(null);
   const [webcamRunning, setWebcamRunning] = useState(false);
   const [gestureOutput, setGestureOutput] = useState("");
   const [gestureRecognizer, setGestureRecognizer] = useState(null);
@@ -125,7 +126,6 @@ const Detect = () => {
 
     console.log("GestureRecognizer loaded");
 
-
     if (webcamRunning === true) {
       setWebcamRunning(false);
       cancelAnimationFrame(requestRef.current);
@@ -172,19 +172,13 @@ const Detect = () => {
         .slice(0, 5)
         .map(([sign, count]) => ({ SignDetected: sign, count }));
 
-
       setDetectedData([]);
     } else {
       setWebcamRunning(true);
       startTime = new Date();
       requestRef.current = requestAnimationFrame(animate);
     }
-  }, [
-    webcamRunning,
-    gestureRecognizer,
-    animate,
-    detectedData
-  ]);
+  }, [webcamRunning, gestureRecognizer, animate, detectedData]);
 
   useEffect(() => {
     async function loadGestureRecognizer() {
@@ -193,7 +187,8 @@ const Detect = () => {
       );
       const recognizer = await GestureRecognizer.createFromOptions(vision, {
         baseOptions: {
-          modelAssetPath:"/islreact/Trained-Model/sign_language_recognizer_25-04-2023.task",
+          modelAssetPath:
+            "/islreact/Trained-Model/sign_language_recognizer_25-04-2023.task",
         },
         numHands: 2,
         runningMode: runningMode,
@@ -203,48 +198,90 @@ const Detect = () => {
     loadGestureRecognizer();
   }, [runningMode]);
 
+  // const handleFileChange = (event) => {
+  //   const fileInput = event.target.files[0];
+  //   if (fileInput && fileInput.files && fileInput.files.length > 0) {
+  //     const file = fileInput.files[0]; // Get the first uploaded file
+  //     console.log("Uploaded file:", file);
+
+  //     // Example: Create a URL for the file and set it as the video source
+  //     const videoURL = URL.createObjectURL(file);
+  //     uploadedVideoRef.current.src = videoURL; // Assuming you want to play it in a video element
+  //   } else {
+  //     console.error("No file uploaded");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   // const processUploadedVideo = async () => {
+  //   //   const video = uploadedVideoRef.current;
+  //   //   const signs = [];
+  //   //   const processFrame = async () => {
+  //   //     if (video.ended || video.paused) {
+  //   //       const uniqueSigns = [];
+  //   //       for (let i = 0; i < signs.length; i++) {
+  //   //         if (i === 0 || signs[i] !== signs[i - 1]) {
+  //   //           uniqueSigns.push(signs[i]);
+  //   //         }
+  //   //       }
+  //   //       console.log(finalSigns);
+  //   //       const finalSigns = uniqueSigns.slice(-15);
+  //   //       const resultString = finalSigns.map((s) => s + "...").join("");
+  //   //       setOutputString(resultString);
+  //   //       return;
+  //   //     }
+  //   //     const now = Date.now();
+  //   //     const result = await gestureRecognizer.recognizeForVideo(video, now);
+  //   //     if (result.gestures.length > 0) {
+  //   //       signs.push(result.gestures[0][0].categoryName);
+  //   //     }
+  //   //     requestAnimationFrame(processFrame);
+  //   //   };
+  //   //   video.play();
+  //   //   processFrame();
+  //   // };
+  // }, []);
+
   return (
     <>
       <div className="signlang_detection-container">
-      
-      {/* LEFT: Webcam + Canvas + Start/Stop Box */}
-      <div className="signlang_left-section">
-        <div style={{ position: "relative" }}>
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            className="signlang_webcam"
-          />
-          <canvas ref={canvasRef} className="signlang_canvas" />
+        {/* LEFT: Webcam + Canvas + Start/Stop Box */}
+        <div className="signlang_left-section">
+          <div style={{ position: "relative" }}>
+            <Webcam audio={false} ref={webcamRef} className="signlang_webcam" />
+            <canvas ref={canvasRef} className="signlang_canvas" />
+          </div>
+
+          <div className="signlang_data-container">
+            <button onClick={enableCam}>
+              {webcamRunning ? "Stop" : "Start"}
+            </button>
+
+            {/* <input type="file" onchange={handleFileChange} ref={uploadedVideoRef}/>
+            <button onClick={handleFileChange}>Upload</button> */}
+
+            <div className="signlang_data">
+              <p className="gesture_output">{gestureOutput}</p>
+              {progress ? <ProgressBar progress={progress} /> : null}
+            </div>
+          </div>
         </div>
 
-        <div className="signlang_data-container">
-          <button onClick={enableCam}>
-            {webcamRunning ? "Stop" : "Start"}
-          </button>
+        {/* RIGHT: Image Display */}
+        <div className="signlang_imagelist-container">
+          <h2 className="gradient__text">Image</h2>
 
-          <div className="signlang_data">
-            <p className="gesture_output">{gestureOutput}</p>
-            {progress ? <ProgressBar progress={progress} /> : null}
+          <div className="signlang_image-div">
+            {currentImage ? (
+              <img src={currentImage.url} alt={`img ${currentImage.id}`} />
+            ) : (
+              <h3 className="gradient__text">
+                Click on the Start Button <br /> to practice with Images
+              </h3>
+            )}
           </div>
         </div>
       </div>
-
-      {/* RIGHT: Image Display */}
-      <div className="signlang_imagelist-container">
-        <h2 className="gradient__text">Image</h2>
-
-        <div className="signlang_image-div">
-          {currentImage ? (
-            <img src={currentImage.url} alt={`img ${currentImage.id}`} />
-          ) : (
-            <h3 className="gradient__text">
-              Click on the Start Button <br /> to practice with Images
-            </h3>
-          )}
-        </div>
-      </div>
-    </div>
     </>
   );
 };
